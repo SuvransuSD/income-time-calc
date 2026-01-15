@@ -4,7 +4,7 @@ import { verifyJWT } from "@/lib/auth";
 
 export async function DELETE(
     req: Request,
-    { params }: { params: { goalId: string } }
+    { params }: { params: Promise<{ goalId: string }> }
 ) {
     try {
         const authHeader = req.headers.get("Authorization");
@@ -17,7 +17,7 @@ export async function DELETE(
 
         const { searchParams } = new URL(req.url);
         const permanent = searchParams.get("permanent") === "true";
-        const goalId = params.goalId;
+        const { goalId } = await params;
 
         if (permanent) {
             // Check if it belongs to user first (for safety) 
@@ -53,7 +53,7 @@ export async function DELETE(
 
 export async function PATCH(
     req: Request,
-    { params }: { params: { goalId: string } }
+    { params }: { params: Promise<{ goalId: string }> }
 ) {
     try {
         const authHeader = req.headers.get("Authorization");
@@ -64,7 +64,7 @@ export async function PATCH(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const goalId = params.goalId;
+        const { goalId } = await params;
         const body = await req.json();
 
         if (body.restore) {
